@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 // Removed unnecessary class definition
 @Entity
-public class transactions {
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

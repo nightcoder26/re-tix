@@ -1,8 +1,16 @@
 package com.example.retix.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 
 
-public class tickets {
+@Entity
+public class Ticket {
+    @Id
     private Long id;
     private String eventName;
     private LocalDateTime dateTime;
