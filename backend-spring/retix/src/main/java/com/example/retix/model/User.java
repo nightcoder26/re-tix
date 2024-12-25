@@ -1,46 +1,59 @@
 package com.example.retix.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import java.util.Set;
 
-@Entity // Marks this class as a JPA entity for table creation
+@Entity
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate ID
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generates ID
+    private Long id;
 
-    @Column(nullable = false) // This field is required
-    private String name;
+    @Column(nullable = false, unique = true) // Ensures username is unique
+    private String username;
 
-    @Column(unique = true, nullable = false) // Ensure email is unique
+    @Column(nullable = false, unique = true) // Ensures email is unique
     private String email;
 
-    @Column(nullable = false) // Storing encrypted passwords is recommended
+    @Column(nullable = false) // Store encrypted passwords
     private String password;
 
-    private String role; // e.g., "Admin", "Buyer", "Seller"
+    @ElementCollection(fetch = FetchType.EAGER) // Allows roles to be fetched eagerly
+    private Set<String> roles;
 
-    private boolean isActive; // To track active/inactive users
+    @Column(nullable = false) // Ensures the field cannot be null
+    private boolean isActive = true; // Default value
+
+    private String fullName; // Optional field for full name
+
+    // Constructors
+    public User() {}
+
+    public User(String username, String email, String password, Set<String> roles, boolean isActive, String fullName) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+        this.isActive = isActive;
+        this.fullName = fullName;
+    }
 
     // Getters and Setters
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -59,19 +72,27 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public Set<String> getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
-    public boolean getIsActive() {
+    public boolean isActive() {
         return isActive;
     }
 
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }
