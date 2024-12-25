@@ -7,25 +7,24 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generates ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true) // Ensures username is unique
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true) // Ensures email is unique
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false) // Store encrypted passwords
+    @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER) // Allows roles to be fetched eagerly
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 
-    @Column(nullable = false) // Ensures the field cannot be null
-    private boolean isActive = true; // Default value
-
-    private String fullName; // Optional field for full name
+    @Column(nullable = false)
+    private boolean isActive = true;
+    private String fullName;
 
     // Constructors
     public User() {}
