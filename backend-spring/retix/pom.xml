@@ -31,7 +31,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.26</version>
+            <version>8.0.34</version>
         </dependency>
 
         <!-- Spring Boot Starter Data JPA (Jakarta Persistence API) -->
@@ -61,7 +61,10 @@
         </dependency>
 
         <!-- Spring Security (for user authentication and authorization) -->
-
+   <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
 
         <!-- JWT Dependencies (for token-based authentication) -->
         <dependency>
