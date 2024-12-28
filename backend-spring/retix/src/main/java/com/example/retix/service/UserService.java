@@ -42,5 +42,16 @@ public class UserService {
         }
     }
 
+    public User deleteUserById(Long id) {
+        Optional<User> existingUserOptional = userRepository.findById(id);
+        if (existingUserOptional.isPresent()) {
+            User existingUser = existingUserOptional.get();
+            userRepository.delete(existingUser);
+            return existingUser;
+
+        }
+        throw new EntityNotFoundException("User not found with id: " + id);
+    }
+
 
 }
