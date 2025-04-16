@@ -1,28 +1,61 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const { login } = useAuth();
+    const dispatch = useDispatch();
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = (e) => {
         e.preventDefault();
-
-        const userData = { email };
-        login(userData);
-
-        navigate('/home');
+        dispatch(login({ username, password }));
+        navigate('/dashboard');
     };
 
+    const handleGoogleLogin = (response) => {
+        if (response.credential) {
+            const googleData = response.credential;
+            dispatch(login({ user: googleData }));
+            navigate('/dashboard');
+        }
+    };
+
+    if (isLoggedIn) {
+        return <p>You are already logged in.</p>;
+    }
+
     return (
-        <form onSubmit={handleSubmit}>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-            <button type="submit">Login</button>
-        </form>
+        <div>
+            <h1>Login Page</h1>
+            <form onSubmit={handleLogin}>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <br />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <br />
+                <button type="submit">Login</button>
+            </form>
+
+            <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={(error) => console.log("Login Failed:", error)}
+            />
+        </div>
     );
 };
 
