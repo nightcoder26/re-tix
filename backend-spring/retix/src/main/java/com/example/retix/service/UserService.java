@@ -2,11 +2,12 @@ package com.example.retix.service;
 
 import com.example.retix.model.User;
 import com.example.retix.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -14,44 +15,35 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // Method to create a user
     public User createUser(User user) {
-        return userRepository.save(user); // Saves the new user into the database
+        return userRepository.save(user);
     }
 
-    public User findUserById(Long id) {
-        return userRepository.findById(id).get();
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    public User updateUser(User user) {
-        // Check if the user with the given id exists
-        Optional<User> existingUserOptional = userRepository.findById(user.getId());
-        if (existingUserOptional.isPresent()) {
-            User existingUser = existingUserOptional.get();
 
-            // Update the necessary fields
+    // Update user by ID
+    public Optional<User> updateUser(Long id, User user) {
+        return userRepository.findById(id).map(existingUser -> {
+            existingUser.setName(user.getName());
             existingUser.setEmail(user.getEmail());
-            existingUser.setFullName(user.getFullName());
-            existingUser.setActive(user.isActive());
             existingUser.setPassword(user.getPassword());
-            existingUser.setUsername(user.getUsername());
-
+            existingUser.setRole(user.getRole());
             return userRepository.save(existingUser);
-        } else {
-            throw new EntityNotFoundException("User not found with id: " + user.getId());
-        }
+        });
+    }
+    
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
-    public User deleteUserById(Long id) {
-        Optional<User> existingUserOptional = userRepository.findById(id);
-        if (existingUserOptional.isPresent()) {
-            User existingUser = existingUserOptional.get();
-            userRepository.delete(existingUser);
-            return existingUser;
-
-        }
-        throw new EntityNotFoundException("User not found with id: " + id);
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
-
-
-}
+    
+    
+    
+    }
