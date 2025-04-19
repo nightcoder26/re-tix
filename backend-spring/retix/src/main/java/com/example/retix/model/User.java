@@ -17,7 +17,9 @@ public class User {
 
     private String password;
 
-    private String role; // BUYER, SELLER, ADMIN
+    @Enumerated(EnumType.STRING)
+      private Role role;
+ // BUYER, SELLER, ADMIN
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -36,7 +38,7 @@ public class User {
 
     public void setPassword(String password) { this.password = password; }
 
-    public String getRole() { return role; }
+    public Role getRole() { return role; }
 
-    public void setRole(String role) { this.role = role; }
+    public void setRole(Role role) { this.role = role; }
 }

@@ -1,6 +1,7 @@
 package com.example.retix.controller;
 
 import com.example.retix.model.User;
+import com.example.retix.model.Role;
 import com.example.retix.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,10 +34,10 @@ public class UserControllerTest {
         user.setName("John Doe");
         user.setEmail("john.doe@example.com");
         user.setPassword("securePassword123");
-        user.setRole("USER");
+        user.setRole(Role.BUYER);
         Mockito.when(userService.createUser(Mockito.any(User.class))).thenReturn(user);
 
-        String userJson = "{ \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"password\": \"securePassword123\", \"role\": \"USER\" }";
+        String userJson = "{ \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"password\": \"securePassword123\", \"role\": \"BUYER\" }";
 
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -50,12 +51,12 @@ public class UserControllerTest {
         user.setName("John Doe");
         user.setEmail("john.doe@example.com");
         user.setPassword("securePassword123");
-        user.setRole("USER");
+        user.setRole(Role.BUYER);
         Mockito.when(userService.getUserByEmail("john.doe@example.com")).thenReturn(Optional.of(user));
 
         mockMvc.perform(get("/api/users/john.doe@example.com"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"password\":\"securePassword123\",\"role\":\"USER\"}"));
+                .andExpect(content().json("{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"password\":\"securePassword123\",\"role\":\"BUYER\"}"));
     }
 
     @Test
@@ -64,17 +65,17 @@ public class UserControllerTest {
         updatedUser.setName("Jane Doe");
         updatedUser.setEmail("jane.doe@example.com");
         updatedUser.setPassword("newPassword456");
-        updatedUser.setRole("ADMIN");
+        updatedUser.setRole(Role.SELLER);
 
         Mockito.when(userService.updateUser(Mockito.eq(1L), Mockito.any(User.class))).thenReturn(Optional.of(updatedUser));
 
-        String updatedUserJson = "{ \"name\": \"Jane Doe\", \"email\": \"jane.doe@example.com\", \"password\": \"newPassword456\", \"role\": \"ADMIN\" }";
+        String updatedUserJson = "{ \"name\": \"Jane Doe\", \"email\": \"jane.doe@example.com\", \"password\": \"newPassword456\", \"role\": \"SELLER\" }";
 
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updatedUserJson))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"password\":\"newPassword456\",\"role\":\"ADMIN\"}"));
+                .andExpect(content().json("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"password\":\"newPassword456\",\"role\":\"SELLER\"}"));
     }
 
     @Test
