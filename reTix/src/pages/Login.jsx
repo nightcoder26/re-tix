@@ -55,6 +55,13 @@ const Login = () => {
                 onSuccess={handleGoogleLogin}
                 onError={(error) => console.log("Login Failed:", error)}
             />
+
+            <p>
+                Don't have an account? <a href="/register">Register here</a>
+            </p>
+            <p>
+                Forgot your password? <a href="/reset-password">Reset it here</a>
+            </p>
         </div>
     );
 };
