@@ -3,9 +3,6 @@ import { login } from '../redux/authSlice'
 import { useDispatch } from 'react-redux'
 const Home = () => {
     const dispatch = useDispatch();
-
-
-
     return (
         <div>Home</div>
     )
