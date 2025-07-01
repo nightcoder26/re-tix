@@ -4,50 +4,56 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tickets")
 public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "event_name", nullable = false)
     private String eventName;
-    private LocalDateTime eventDateTime;
-    private String seatDetails;
+
+    private LocalDateTime eventDateTime;   // ✅ new field
     private double price;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id") // the seller
-    private User seller;
+    public String getEventName() {
+        return eventName;
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id") // the buyer
-    private User buyer;
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
-    private String status; // e.g., AVAILABLE, REQUESTED, SOLD
+    @Enumerated(EnumType.STRING)
+ @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'AVAILABLE'")
+private TicketStatus status = TicketStatus.AVAILABLE;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public String getEventName() { return eventName; }
-    public void setEventName(String eventName) { this.eventName = eventName; }
+    @ManyToOne private User seller;
+    @ManyToOne private User buyer;
 
-    public LocalDateTime getEventDateTime() { return eventDateTime; }
-    public void setEventDateTime(LocalDateTime eventDateTime) { this.eventDateTime = eventDateTime; }
+    private String seatDetails;
 
-    public String getSeatDetails() { return seatDetails; }
-    public void setSeatDetails(String seatDetails) { this.seatDetails = seatDetails; }
+    /* ---------- getters & setters ---------- */
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public Long getId()                          { return id; }
+    public void setId(Long id)                   { this.id = id; }
 
-    public User getSeller() { return seller; }
-    public void setSeller(User seller) { this.seller = seller; }
+    public LocalDateTime getEventDateTime()      { return eventDateTime; }      // ✅
+    public void setEventDateTime(LocalDateTime d){ this.eventDateTime = d; }    // ✅
 
-    public User getBuyer() { return buyer; }
-    public void setBuyer(User buyer) { this.buyer = buyer; }
+    public double getPrice()                     { return price; }
+    public void setPrice(double price)           { this.price = price; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public TicketStatus getStatus()              { return status; }
+    public void setStatus(TicketStatus status)   { this.status = status; }
+
+    public User getSeller()                      { return seller; }
+    public void setSeller(User seller)           { this.seller = seller; }
+
+    public User getBuyer()                       { return buyer; }
+    public void setBuyer(User buyer)             { this.buyer = buyer; }
+
+    public String getSeatDetails()               { return seatDetails; }
+    public void setSeatDetails(String seat)      { this.seatDetails = seat; }
 }

@@ -34,7 +34,7 @@ public class UserController {
             }
             Role role;
             try {
-                role = Role.valueOf(userDTO.getRole());
+                role = Role.valueOf(userDTO.getRole().toUpperCase());
             } catch (IllegalArgumentException e) {
                 logger.error("Invalid role value: {}", userDTO.getRole());
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -79,7 +79,7 @@ public class UserController {
         try {
             Role role;
             try {
-                role = Role.valueOf(userDTO.getRole());
+                role = Role.valueOf(userDTO.getRole().toUpperCase());
             } catch (IllegalArgumentException | NullPointerException e) {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }

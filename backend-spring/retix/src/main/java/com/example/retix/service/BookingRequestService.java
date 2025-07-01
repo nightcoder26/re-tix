@@ -5,6 +5,7 @@ import com.example.retix.repository.BookingRequestRepository;
 import com.example.retix.repository.TicketRepository;
 import com.example.retix.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,56 +17,65 @@ public class BookingRequestService {
     private final TicketRepository ticketRepo;
     private final UserRepository userRepo;
 
-    public BookingRequestService(BookingRequestRepository bookingRequestRepo, TicketRepository ticketRepo, UserRepository userRepo) {
+    public BookingRequestService(BookingRequestRepository bookingRequestRepo,
+                                 TicketRepository ticketRepo,
+                                 UserRepository userRepo) {
         this.bookingRequestRepo = bookingRequestRepo;
         this.ticketRepo = ticketRepo;
         this.userRepo = userRepo;
     }
 
+    /* ------------------------------------------------------------- */
+    /* 1. Buyer creates a booking request                            */
+    /* ------------------------------------------------------------- */
+    @Transactional
     public BookingRequest createRequest(Long ticketId, Long buyerId) {
-        Ticket ticket = ticketRepo.findById(ticketId).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
-        User buyer = userRepo.findById(buyerId).orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
-        if (!"AVAILABLE".equalsIgnoreCase(ticket.getStatus())) {
-            throw new IllegalStateException("Ticket is not available for booking");
-        }
+        Ticket ticket = ticketRepo.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+        User buyer = userRepo.findById(buyerId)
+                .orElseThrow(() -> new IllegalArgumentException("Buyer not found"));
 
-        BookingRequest request = new BookingRequest();
-        request.setTicket(ticket);
-        request.setBuyer(buyer);
-        request.setStatus(BookingRequest.Status.PENDING);
-        request.setTimestamp(LocalDateTime.now());
+        if (ticket.getStatus() != TicketStatus.AVAILABLE)
+            throw new IllegalStateException("Ticket not available");
 
-        // Optionally update ticket status to REQUESTED
-        ticket.setStatus("REQUESTED");
+        BookingRequest req = new BookingRequest();
+        req.setTicket(ticket);
+        req.setBuyer(buyer);
+        req.setStatus(BookingRequest.Status.PENDING);
+        req.setTimestamp(LocalDateTime.now());
+
+        ticket.setStatus(TicketStatus.REQUESTED);
         ticketRepo.save(ticket);
 
-        return bookingRequestRepo.save(request);
+        return bookingRequestRepo.save(req);
     }
 
+    /* ------------------------------------------------------------- */
+    /* 2. Seller responds (ACCEPT / DECLINE)                         */
+    /* ------------------------------------------------------------- */
+    @Transactional
     public BookingRequest respondToRequest(Long requestId, BookingRequest.Status status) {
-        BookingRequest request = bookingRequestRepo.findById(requestId).orElseThrow(() -> new IllegalArgumentException("Booking request not found"));
-        Ticket ticket = request.getTicket();
 
-        // Check if the user responding is the seller of the ticket
-        User seller = ticket.getSeller();
-        // Here, we would need the user context or sellerId to verify authorization
-        // For now, assume authorization is handled elsewhere or passed as parameter
+        BookingRequest req = bookingRequestRepo.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
-        request.setStatus(status);
+        Ticket ticket = req.getTicket();
+        req.setStatus(status);
 
         if (status == BookingRequest.Status.ACCEPTED) {
-            ticket.setStatus("SOLD");
-            ticket.setBuyer(request.getBuyer());
-            ticketRepo.save(ticket);
+            ticket.setStatus(TicketStatus.SOLD);
+            ticket.setBuyer(req.getBuyer());
         } else if (status == BookingRequest.Status.DECLINED) {
-            ticket.setStatus("AVAILABLE");
-            ticketRepo.save(ticket);
+            ticket.setStatus(TicketStatus.AVAILABLE);
         }
-
-        return bookingRequestRepo.save(request);
+        ticketRepo.save(ticket);
+        return bookingRequestRepo.save(req);
     }
 
+    /* ------------------------------------------------------------- */
+    /* 3. Query helpers                                              */
+    /* ------------------------------------------------------------- */
     public List<BookingRequest> getRequestsForSeller(Long sellerId) {
         return bookingRequestRepo.findByTicketSellerId(sellerId);
     }

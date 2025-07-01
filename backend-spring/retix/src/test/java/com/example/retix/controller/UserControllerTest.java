@@ -11,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashSet;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,6 +37,23 @@ public class UserControllerTest {
         Mockito.when(userService.createUser(Mockito.any(User.class))).thenReturn(user);
 
         String userJson = "{ \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"password\": \"securePassword123\", \"role\": \"BUYER\" }";
+
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testCreateUserWithLowerCaseRole() throws Exception {
+        User user = new User();
+        user.setName("Alice Smith");
+        user.setEmail("alice.smith@example.com");
+        user.setPassword("password123");
+        user.setRole(Role.SELLER);
+        Mockito.when(userService.createUser(Mockito.any(User.class))).thenReturn(user);
+
+        String userJson = "{ \"name\": \"Alice Smith\", \"email\": \"alice.smith@example.com\", \"password\": \"password123\", \"role\": \"seller\" }";
 
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -76,6 +92,25 @@ public class UserControllerTest {
                 .content(updatedUserJson))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"name\":\"Jane Doe\",\"email\":\"jane.doe@example.com\",\"password\":\"newPassword456\",\"role\":\"SELLER\"}"));
+    }
+
+    @Test
+    public void testUpdateUserWithLowerCaseRole() throws Exception {
+        User updatedUser = new User();
+        updatedUser.setName("Bob Brown");
+        updatedUser.setEmail("bob.brown@example.com");
+        updatedUser.setPassword("newPassword789");
+        updatedUser.setRole(Role.BUYER);
+
+        Mockito.when(userService.updateUser(Mockito.eq(2L), Mockito.any(User.class))).thenReturn(Optional.of(updatedUser));
+
+        String updatedUserJson = "{ \"name\": \"Bob Brown\", \"email\": \"bob.brown@example.com\", \"password\": \"newPassword789\", \"role\": \"buyer\" }";
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/users/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updatedUserJson))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"name\":\"Bob Brown\",\"email\":\"bob.brown@example.com\",\"password\":\"newPassword789\",\"role\":\"BUYER\"}"));
     }
 
     @Test
