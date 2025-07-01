@@ -24,7 +24,10 @@ public class TicketService {
         this.userRepository   = userRepository;
     }
 
-    public Ticket createTicket(Ticket t)             { return ticketRepository.save(t); }
+    public Ticket createTicket(Ticket t) { 
+         if (t.getOwner() == null) t.setOwner(t.getSeller());
+        return ticketRepository.save(t);
+    }
     public List<Ticket> getAllTickets()              { return ticketRepository.findAll(); }
     public Optional<Ticket> getTicketById(Long id)   { return ticketRepository.findById(id); }
     public void deleteTicket(Long id)                { ticketRepository.deleteById(id); }
@@ -46,6 +49,7 @@ public class TicketService {
         t.setStatus(TicketStatus.AVAILABLE);
         t.setBuyer(null);
         t.setSeller(current);
+        t.setOwner(current);
         return ticketRepository.save(t);
     }
 
@@ -83,7 +87,7 @@ public Ticket transfer(Long ticketId, Long currentUserId) {
     t.setOwner(t.getBuyer());
     t.setBuyer(null);
     t.setStatus(TicketStatus.TRANSFERRED);
-
+    t.setBuyer(null);  
     return ticketRepository.save(t);
 }
 
@@ -182,4 +186,7 @@ public Ticket transfer(Long ticketId, Long currentUserId) {
         t.setStatus(TicketStatus.SOLD);
         ticketRepository.save(t);
     }
+
+    
+
 }

@@ -3,6 +3,7 @@ package com.example.retix.controller;
 import com.example.retix.model.*;
 import com.example.retix.service.TicketService;
 import com.example.retix.service.UserService;
+import com.example.retix.repository.BookingRequestRepository;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +15,13 @@ public class TicketController {
 
     private final TicketService ticketService;
     private final UserService   userService;
+    private final BookingRequestRepository bookingRequestRepository;
 
-    public TicketController(TicketService ticketService, UserService userService) {
+    public TicketController(TicketService ticketService, UserService userService, BookingRequestRepository bookingRequestRepository) {
         this.ticketService = ticketService;
         this.userService   = userService;
+        this.bookingRequestRepository = bookingRequestRepository;
     }
-
-    /* ------------------------- POST /api/tickets ------------------------- */
     @PostMapping
     public ResponseEntity createTicket(@RequestBody TicketDTO dto) {
 
@@ -35,22 +36,20 @@ public class TicketController {
 
         Ticket t = new Ticket();
         t.setEventName(dto.getEventName());
-        t.setEventDateTime(dto.getEventDateTime());   // assuming this setter exists
+        t.setEventDateTime(dto.getEventDateTime());   
         t.setSeatDetails(dto.getSeatDetails());
         t.setPrice(dto.getPrice());
         t.setSeller(seller);
-        t.setStatus(TicketStatus.AVAILABLE);          // ✅ enum, not String
+        t.setStatus(TicketStatus.AVAILABLE);       
 
         return new ResponseEntity<>(ticketService.createTicket(t), HttpStatus.CREATED);
     }
 
-    /* ------------------------- GET /api/tickets -------------------------- */
     @GetMapping
     public List<Ticket> getAllTickets() {
         return ticketService.getAllTickets();
     }
 
-    /* ------------------------- GET /api/tickets/{id} --------------------- */
     @GetMapping("/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id)
@@ -58,22 +57,19 @@ public class TicketController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /* ------------------------- DELETE /api/tickets/{id} ------------------ */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTicket(@PathVariable Long id) {
+        var bookingRequests = bookingRequestRepository.findByTicketId(id);
+        if (!bookingRequests.isEmpty()) {
+            bookingRequestRepository.deleteAll(bookingRequests);
+        }
         ticketService.deleteTicket(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("deleted successfully");
     }
 
-    /* ------------------------- GET /api/tickets/search ------------------- */
     @GetMapping("/search")
     public List<Ticket> searchTickets(@RequestParam String eventName) {
         return ticketService.searchTickets(eventName);
     }
 
-   @PostMapping("/reserve")
-    public ResponseEntity<Ticket> reserveTicket(@RequestBody BookingRequestDTO dto) {
-        Ticket reserved = ticketService.reserve(dto.getTicketId(), dto.getBuyerId());
-        return ResponseEntity.ok(reserved);
     }
-}
