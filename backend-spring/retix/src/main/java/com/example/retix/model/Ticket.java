@@ -16,6 +16,12 @@ public class Ticket {
     private LocalDateTime eventDateTime;   // ✅ new field
     private double price;
 
+    @ManyToOne
+private User owner; 
+
+public User getOwner()  { return owner; }
+    public void setOwner(User o) { this.owner = o; }
+
     public String getEventName() {
         return eventName;
     }

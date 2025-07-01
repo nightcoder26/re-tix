@@ -22,12 +22,16 @@ public class TicketController {
 
     /* ------------------------- POST /api/tickets ------------------------- */
     @PostMapping
-    public ResponseEntity<Ticket> createTicket(@RequestBody TicketDTO dto) {
+    public ResponseEntity createTicket(@RequestBody TicketDTO dto) {
 
         if (dto.getSellerId() == null)      return ResponseEntity.badRequest().build();
 
         User seller = userService.getUserById(dto.getSellerId()).orElse(null);
         if (seller == null)                 return ResponseEntity.badRequest().build();
+
+        if (seller.getRole() == Role.BUYER) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Role access denied: seller cannot be a buyer");
+        }
 
         Ticket t = new Ticket();
         t.setEventName(dto.getEventName());

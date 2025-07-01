@@ -13,6 +13,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findBySeller(User seller);
 
     List<Ticket> findByBuyer(User buyer);
+    List<Ticket> findByOwner(User u);
+
 
     List<Ticket> findBySellerAndStatus(User seller, TicketStatus requested);
 }

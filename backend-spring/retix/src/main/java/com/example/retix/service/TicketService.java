@@ -68,6 +68,26 @@ public class TicketService {
         return saved;
     }
 
+    @Transactional
+public Ticket transfer(Long ticketId, Long currentUserId) {
+
+    Ticket t = ticketRepository.findById(ticketId)
+            .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+
+    if (t.getStatus() != TicketStatus.SOLD)
+        throw new IllegalStateException("Ticket not paid");
+
+    if (!t.getBuyer().getId().equals(currentUserId))
+        throw new IllegalStateException("Only buyer can claim transfer");
+
+    t.setOwner(t.getBuyer());
+    t.setBuyer(null);
+    t.setStatus(TicketStatus.TRANSFERRED);
+
+    return ticketRepository.save(t);
+}
+
+
     public void fixSoldTicketsWithNullBuyer(User placeholder) {
         List<Ticket> list = ticketRepository.findAll();
         for (Ticket t : list) {

@@ -3,6 +3,9 @@ package com.example.retix.controller;
 
 import com.example.retix.model.Payment;
 import com.example.retix.service.PaymentService;
+
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +35,13 @@ public class PaymentController {
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<?> confirm(@RequestParam Long paymentId,
-                                     @RequestParam Long currentUserId) {
+    public ResponseEntity<?> confirm(@RequestParam Long paymentId, @RequestParam Long currentUserId) {
         Payment p = svc.getPayment(paymentId);
         if (p == null) return ResponseEntity.badRequest().build();
         if (!p.getBuyerId().equals(currentUserId)) return ResponseEntity.status(403).build();
         return svc.markPaymentAsCompleted(paymentId)
-                ? ResponseEntity.ok().build()
-                : ResponseEntity.badRequest().build();
+                ? ResponseEntity.ok("Payment Confirmed")
+                : ResponseEntity.badRequest().body("could not confirm payment");
     }
 
     @GetMapping("/{id}")
