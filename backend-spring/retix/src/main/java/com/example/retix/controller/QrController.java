@@ -74,6 +74,7 @@ public class QrController {
     @PostMapping("/verify")
 public ResponseEntity<String> verifyTicket(@RequestBody Map<String, String> payload) {
     // 1. Extract token from JSON body
+
     String token = payload.get("token");
     if (token == null || token.isBlank()) {
         return ResponseEntity.badRequest().body("Missing token");
@@ -101,6 +102,11 @@ public ResponseEntity<String> verifyTicket(@RequestBody Map<String, String> payl
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Owner mismatch");
         }
 
+         if (ticket.isUsed()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Ticket already used");
+        }
+
+
         long actualTime = ticket.getEventDateTime()
                 .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         if (Math.abs(actualTime - eventDateTimeMillis) > 1000) {
@@ -113,6 +119,8 @@ public ResponseEntity<String> verifyTicket(@RequestBody Map<String, String> payl
             return ResponseEntity.status(HttpStatus.GONE).body("QR code expired");
         }
 
+        ticket.setUsed(true);
+        ticketService.createTicket(ticket);
         return ResponseEntity.ok("QR code verified ✅");
 
     } catch (Exception e) {

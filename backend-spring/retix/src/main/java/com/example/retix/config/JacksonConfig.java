@@ -18,6 +18,7 @@ import java.io.IOException;
 public class JacksonConfig {
 
     @Bean
+    @SuppressWarnings("unchecked")
     public Module caseInsensitiveEnumModule() {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Enum.class, new JsonDeserializer<Enum>() {

@@ -13,6 +13,9 @@ public class Ticket {
     @Column(name = "event_name", nullable = false)
     private String eventName;
 
+    private boolean used = false;
+
+
     private LocalDateTime eventDateTime;   // ✅ new field
     private double price;
 
@@ -62,4 +65,7 @@ private TicketStatus status = TicketStatus.AVAILABLE;
 
     public String getSeatDetails()               { return seatDetails; }
     public void setSeatDetails(String seat)      { this.seatDetails = seat; }
+   
+    public boolean isUsed()       { return used; }
+public void setUsed(boolean u){ this.used = u; }
 }
